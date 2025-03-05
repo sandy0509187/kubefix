@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:v1.19.0
+          image: nginx:stable
           ports:
             - containerPort: 80
 ---
