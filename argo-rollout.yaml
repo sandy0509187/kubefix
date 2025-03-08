@@ -71,18 +71,22 @@ spec:
     failureCondition: result == ""
     provider:
       job:
+        metadata:
+          name: canary-pod-names-job   # Custom job name
         spec:
+          backoffLimit: 2
           template:
+            metadata: {}
             spec:
               containers:
-              - name: kubectl-container
-                image: bitnami/kubectl:1.21.5
-                command:
-                - /bin/sh
-                - -c
-                - |
-                  kubectl get pods -l app=nginx -n default -o=jsonpath='{.items[*].metadata.name}'
+                - command:
+                    - /bin/sh
+                    - '-c'
+                    - >
+                      kubectl get pods -l app=nginx -n default -o=jsonpath='{.items[*].metadata.name}'
+                  image: 'bitnami/kubectl:1.21.5'
+                  name: kubectl-container
               restartPolicy: Never
-          backoffLimit: 2
     valueFrom:
       path: $.data.result
+
