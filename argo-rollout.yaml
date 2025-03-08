@@ -70,9 +70,19 @@ spec:
     successCondition: result != ""
     failureCondition: result == ""
     provider:
-      kubernetes:
-        namespace: kube-system
-        query: >
-          kubectl get pods -l app=nginx -n default -o=jsonpath='{.items[*].metadata.name}'
+      job:
+        spec:
+          template:
+            spec:
+              containers:
+              - name: kubectl-container
+                image: bitnami/kubectl:1.21.5
+                command:
+                - /bin/sh
+                - -c
+                - |
+                  kubectl get pods -l app=nginx -n default -o=jsonpath='{.items[*].metadata.name}'
+              restartPolicy: Never
+          backoffLimit: 2
     valueFrom:
       path: $.data.result
