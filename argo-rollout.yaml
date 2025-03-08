@@ -71,9 +71,8 @@ spec:
     failureCondition: result == ""
     provider:
       kubernetes:
-        configContext: default
-        namespace: default
-        query: |
-          kubectl get pods -l app=nginx -n kube-system -o=jsonpath='{.items[*].metadata.name}'
+        namespace: kube-system
+        query: >
+          kubectl get pods -l app=nginx -n default -o=jsonpath='{.items[*].metadata.name}'
     valueFrom:
-      path: "$.data.result"
+      path: $.data.result
