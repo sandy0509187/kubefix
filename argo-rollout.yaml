@@ -10,12 +10,6 @@ spec:
       - setWeight: 25
       - pause: {}
       - setWeight: 100
-      analysis:
-        templates:
-        - templateName: canary-pod-name-analysis
-        args:
-        - name: rolloutName
-          value: nginx-rollout
   selector:
     matchLabels:
       app: nginx
