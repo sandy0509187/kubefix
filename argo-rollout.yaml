@@ -8,7 +8,6 @@ spec:
     canary:
       steps:
       - setWeight: 25
-      - pause: {}
       - setWeight: 100
   selector:
     matchLabels:
