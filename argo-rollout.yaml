@@ -20,74 +20,11 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:stable
+          image: nginx:latest
           ports:
             - containerPort: 80
   analysis:
-    interval: 1h
     retry:
       limit: 3
     templates:
     - name: nginx-load-test  # Referencing the previously defined AnalysisTemplate
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-spec:
-  selector:
-    app: nginx
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nginx-ingress
-spec:
-  rules:
-  - host: nginx.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: nginx-service
-            port:
-              number: 80
----
-# apiVersion: argoproj.io/v1alpha1
-# kind: AnalysisTemplate
-# metadata:
-#   name: canary-pod-name-analysis
-# spec:
-#   metrics:
-#   - name: canaryPodNames
-#     interval: 30s
-#     successCondition: result != ""
-#     failureCondition: result == ""
-#     provider:
-#       job:
-#         metadata:
-#           name: canary-pod-names-job   # Custom job name
-#         spec:
-#           backoffLimit: 2
-#           template:
-#             metadata: {}
-#             spec:
-#               containers:
-#                 - command:
-#                     - /bin/sh
-#                     - '-c'
-#                     - >
-#                       kubectl get pods -l app=nginx -n kube-system -o=jsonpath='{.items[*].metadata.name}'
-#                   image: 'bitnami/kubectl:1.21.5'
-#                   name: kubectl-container
-#               restartPolicy: Never
-#     valueFrom:
-#       path: $.data.result
-
