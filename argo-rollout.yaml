@@ -6,9 +6,20 @@ spec:
   replicas: 4
   strategy:
     canary:
+      analysis:
+        # Reference the AnalysisTemplate that you will define below
+        templates:
+        - templateName: nginx-load-test
       steps:
-      - setWeight: 25
-      - setWeight: 100
+        # Steps for gradual rollout, each followed by a pause
+        - setWeight: 20
+        - pause: {duration: 10m}
+        - setWeight: 40
+        - pause: {duration: 10m}
+        - setWeight: 60
+        - pause: {duration: 10m}
+        - setWeight: 80
+        - pause: {duration: 10m}
   selector:
     matchLabels:
       app: nginx
@@ -19,14 +30,10 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:stable
+          image: nginx:latest
           ports:
             - containerPort: 80
-  analysis:
-    retry:
-      limit: 3
-    templates:
-    - name: nginx-load-test  # Referencing the previously defined AnalysisTemplate
+
 
 ---
 apiVersion: v1
