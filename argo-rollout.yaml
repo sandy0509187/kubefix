@@ -23,6 +23,13 @@ spec:
           image: nginx:stable
           ports:
             - containerPort: 80
+  analysis:
+    interval: 1h
+    retry:
+      limit: 3
+    templates:
+    - name: nginx-load-test  # Referencing the previously defined AnalysisTemplate
+
 ---
 apiVersion: v1
 kind: Service

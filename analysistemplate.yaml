@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: nginx-load-test
+spec:
+  metrics:
+  - name: nginx-load-test
+    successCondition: result == "success"
+    failureCondition: result == "failure"
+    provider:
+      cron:
+        schedule: "@daily"
+        job:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: k6-load-test
+          spec:
+            template:
+              spec:
+                containers:
+                - name: k6
+                  image: sabarlabsenv/k6-load-test
+                  command: ["k6", "run", "/load-test.js"]
+                restartPolicy: Never
