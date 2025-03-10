@@ -9,7 +9,8 @@ spec:
       analysis:
         # Reference the AnalysisTemplate that you will define below
         templates:
-        - templateName: nginx-load-test
+          - templateName: nginx-load-test
+        startingStep: 1
       steps:
         # Steps for gradual rollout, each followed by a pause
         - setWeight: 20
