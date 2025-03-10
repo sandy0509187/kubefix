@@ -1,18 +1,17 @@
 import http from 'k6/http';
 import { check } from 'k6';
-import { sleep } from 'k6';
+
+// Access the CANARY_POD_IP environment variable
+const canaryPodIp = __ENV.CANARY_POD_IP; // This will get the value of CANARY_POD_IP
+const port = '80'; // Constant port
 
 export default function () {
-  // Replace with your Nginx service URL
-  const url = 'http://nginx-service.default.svc.cluster.local';  // Modify with the correct URL or service name in your K8s cluster
+    // Construct the URL with the dynamic IP and constant port
+    const url = `http://${canaryPodIp}:${port}/your-endpoint`; // Replace with the actual endpoint
+    const response = http.get(url);
 
-  const res = http.get(url);
-
-  // Check the response status code
-  check(res, {
-    'is status 200': (r) => r.status === 200,
-  });
-
-  // Sleep between requests
-  sleep(1);
+    // Check for a successful response
+    check(response, {
+        'is status 200': (r) => r.status === 200,
+    });
 }
