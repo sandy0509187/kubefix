@@ -8,52 +8,50 @@ spec:
     successCondition: result == "success"
     failureCondition: result == "failure"
     provider:
-      cron:
-        schedule: "@daily"
-        job:
-          apiVersion: batch/v1
-          kind: Job
-          metadata:
-            name: k6-load-test
-          spec:
-            template:
-              spec:
-                initContainers:
-                - name: get-canary-pod-ip
-                  image: bitnami/kubectl:latest
-                  command:
-                    - /bin/bash
-                    - -c
-                    - |
-                      # Get the stable ReplicaSet hash (rollout-pod-template-hash) for the canary version
-                      RS_HASH=$(kubectl get rollout nginx-rollout -n kube-system -o=jsonpath='{.status.stableRS}')
-                      
-                      # Now get the pod IP of the pod with that hash label
-                      CANARY_POD_IP=$(kubectl get pod -l rollouts-pod-template-hash=$RS_HASH -n kube-system -o jsonpath='{.items[0].status.podIP}')
-                      
-                      # Write the IP to a file
-                      echo "CANARY_POD_IP=$CANARY_POD_IP" > /etc/podinfo/pod_ip.txt
-                  volumeMounts:
-                  - name: podinfo
-                    mountPath: /etc/podinfo
-
-                containers:
-                - name: k6
-                  image: sabarlabsenv/k6-load-test  # Keep this consistent with your existing setup
-                  command: ["k6", "run", "/load-test.js"]
-                  env:
-                  - name: CANARY_POD_IP
-                    valueFrom:
-                      configMapKeyRef:
-                        name: pod-info
-                        key: pod_ip
-                  volumeMounts:
-                  - name: podinfo
-                    mountPath: /etc/podinfo
-                  
-                restartPolicy: Never
-                volumes:
+      job:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: k6-load-test
+        spec:
+          template:
+            spec:
+              initContainers:
+              - name: get-canary-pod-ip
+                image: bitnami/kubectl:latest
+                command:
+                  - /bin/bash
+                  - -c
+                  - |
+                    # Get the stable ReplicaSet hash (rollout-pod-template-hash) for the canary version
+                    RS_HASH=$(kubectl get rollout nginx-rollout -n kube-system -o=jsonpath='{.status.stableRS}')
+                    
+                    # Now get the pod IP of the pod with that hash label
+                    CANARY_POD_IP=$(kubectl get pod -l rollouts-pod-template-hash=$RS_HASH -n kube-system -o jsonpath='{.items[0].status.podIP}')
+                    
+                    # Write the IP to a file
+                    echo "CANARY_POD_IP=$CANARY_POD_IP" > /etc/podinfo/pod_ip.txt
+                volumeMounts:
                 - name: podinfo
-                  emptyDir: {}
+                  mountPath: /etc/podinfo
 
-            backoffLimit: 4
+              containers:
+              - name: k6
+                image: sabarlabsenv/k6-load-test  # Keep this consistent with your existing setup
+                command: ["k6", "run", "/load-test.js"]
+                env:
+                - name: CANARY_POD_IP
+                  valueFrom:
+                    configMapKeyRef:
+                      name: pod-info
+                      key: pod_ip
+                volumeMounts:
+                - name: podinfo
+                  mountPath: /etc/podinfo
+                
+              restartPolicy: Never
+              volumes:
+              - name: podinfo
+                emptyDir: {}
+
+          backoffLimit: 4
