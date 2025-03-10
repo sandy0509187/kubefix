@@ -9,10 +9,8 @@ spec:
     failureCondition: result == "failure"
     provider:
       job:
-        apiVersion: batch/v1
-        kind: Job
         metadata:
-          name: k6-load-test
+          name: nginx-load-test
         spec:
           backoffLimit: 4
           template:
