@@ -14,6 +14,7 @@ spec:
         metadata:
           name: k6-load-test
         spec:
+          backoffLimit: 4
           template:
             spec:
               initContainers:
@@ -48,10 +49,8 @@ spec:
                 volumeMounts:
                 - name: podinfo
                   mountPath: /etc/podinfo
-                
+
               restartPolicy: Never
               volumes:
               - name: podinfo
                 emptyDir: {}
-
-          backoffLimit: 4
