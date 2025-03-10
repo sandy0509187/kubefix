@@ -9,8 +9,6 @@ spec:
     failureCondition: result == "failure"
     provider:
       job:
-        metadata:
-          name: nginx-load-test
         spec:
           backoffLimit: 4
           template:
@@ -36,7 +34,7 @@ spec:
 
               containers:
               - name: k6
-                image: sabarlabsenv/k6-load-test  # Keep this consistent with your existing setup
+                image: sabarlabsenv/k6-load-test
                 command: ["k6", "run", "/load-test.js"]
                 env:
                 - name: CANARY_POD_IP
@@ -52,3 +50,4 @@ spec:
               volumes:
               - name: podinfo
                 emptyDir: {}
+
